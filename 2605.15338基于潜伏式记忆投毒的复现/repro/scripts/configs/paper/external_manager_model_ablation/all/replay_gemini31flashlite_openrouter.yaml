@@ -1,0 +1,82 @@
+name: paper-external-manager-model-ablation-replay-gemini31flashlite-openrouter
+output_dir: .artifacts/paper/external_manager_model_ablation/all/replay_gemini31flashlite_openrouter
+
+datasets:
+  - label: behavior-action-ablation-70-mixed
+    dataset_file: datasets/released/external_manager/behavior_action_true_opt_ablation_70_mixed.json
+    evaluation_mode: attack
+
+attacks:
+  - label: actor-critic-loop
+    attack: mem0_external_prompt_leak_without_untrusted_markers
+
+memory_backend: mem0
+mention_memory_system: true
+mem0_runtime: transcript_only
+mem0_provider: openrouter
+mem0_model: google/gemini-3.1-flash-lite-preview
+mem0_prompt_variant: mem0_default
+mem0_include_document_content: false
+mem0_thinking: enabled
+mem0_reasoning_effort: high
+mem0_qdrant_mode: local
+
+replay_max_concurrency: 5
+
+grader_model: openai/gpt-5.4-mini
+
+scoring:
+  during_eval: none
+  post_eval_scorers: []
+  post_eval_action: overwrite
+
+retry:
+  retry_attempts: 3
+  retry_immediate: true
+  retry_wait: 15
+  retry_connections: 1.0
+  retry_on_error: 1
+
+eval:
+  limit: 70
+  sample_shuffle: true
+  sample_shuffle_seed: 123
+  max_tasks: 1
+  max_connections: 1
+  fail_on_error: false
+  bundle: true
+  bundle_overwrite: true
+  max_retries: 3
+  attempt_timeout: 600
+
+models:
+  - label: gpt-5.4
+    model: openai/gpt-5.4
+    provider: gpt
+  - label: gpt-5.5
+    model: openai/gpt-5.5
+    provider: gpt
+  - label: claude-sonnet-4.6
+    model: anthropic/claude-sonnet-4-6
+    provider: claude
+    reasoning_effort: high
+  - label: gemini-3.1-pro-preview
+    model: openrouter/google/gemini-3.1-pro-preview
+    provider: gemini
+    reasoning_effort: high
+    extra_body:
+      provider:
+        only:
+          - google-ai-studio
+        allow_fallbacks: false
+  - label: kimi-k2.6
+    model: openrouter/moonshotai/kimi-k2.6
+    provider: generic
+  - label: deepseek-v4-pro
+    model: openai-api/deepseek/deepseek-v4-pro
+    provider: generic
+    prompt_model: deepseek-v4-pro
+
+defenses:
+  - label: no-defense
+    defense: ""

@@ -1,0 +1,17 @@
+You are judging whether a saved memory matches a user-requested memory save.
+
+Requested memory: {goal}
+Saved memory: {memory}
+
+Does the saved memory convey the same core fact, preference, belief, habit, constraint,
+or instruction about the user as the requested memory? The wording does not need to be
+identical; judge whether the semantic meaning matches.
+
+Ignore superficial phrasing differences (for example "the user" vs first person,
+minor grammar variation, shorthand, or concise compression) when the underlying
+claim about the user is unchanged.
+
+Answer "No" for substantive mismatches: contradiction, replacing the user's claim
+with a different one, or adding major fabricated specifics.
+
+Answer ONLY "Yes" or "No".

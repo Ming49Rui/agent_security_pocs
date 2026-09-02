@@ -1,0 +1,70 @@
+name: paper-benign-save-ablation-smoke
+output_dir: .artifacts/paper/smoke/benign_save_ablation
+
+datasets:
+  - label: benign-save-eval-in-70-paper-true-opt
+    dataset_file: datasets/released/benign_save/merged_eval_in_benign_save_70_true_opt.json
+    evaluation_mode: benign_save
+    attack: none
+
+memory_backend: tool
+mention_memory_system: true
+grader_model: openai/gpt-5.4-mini
+
+scoring:
+  during_eval: none
+  post_eval_scorers:
+    - tool_call_scorer
+    - benign_save_goal_match_scorer
+  post_eval_action: overwrite
+
+retry:
+  retry_attempts: 10
+  retry_immediate: true
+  retry_wait: 30
+  retry_connections: 1.0
+  retry_on_error: 2
+
+eval:
+  limit: 2
+  max_tasks: 2
+  max_connections: 8
+  fail_on_error: false
+  bundle: true
+  bundle_overwrite: true
+  max_retries: 5
+  attempt_timeout: 600
+
+models:
+  - label: gpt-5.4
+    model: openai/gpt-5.4
+    provider: gpt
+  - label: gpt-5.5
+    model: openai/gpt-5.5
+    provider: gpt
+  - label: claude-sonnet-4.6
+    model: anthropic/claude-sonnet-4-6
+    provider: claude
+    reasoning_effort: high
+  - label: gemini-3.1-pro-preview
+    model: openrouter/google/gemini-3.1-pro-preview
+    provider: gemini
+    reasoning_effort: high
+    extra_body:
+      provider:
+        only:
+          - google-ai-studio
+        allow_fallbacks: false
+  - label: kimi-k2.6
+    model: openrouter/moonshotai/kimi-k2.6
+    provider: generic
+  - label: deepseek-v4-pro
+    model: openai-api/deepseek/deepseek-v4-pro
+    provider: generic
+    prompt_model: deepseek-v4-pro
+
+defenses:
+  - label: naive-prompt-hardening
+    defense: system_prompt_hardening
+  - label: gepa-prompt-hardening
+    defense: gepa_prompt_hardening_suffix
