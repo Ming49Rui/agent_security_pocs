@@ -1,0 +1,7 @@
+boto3>=1.35.0
+transformers>=4.40.0
+torch>=2.1.0
+scipy>=1.12.0
+openai>=1.30.0
+google-cloud-aiplatform>=1.50.0
+google-auth>=2.29.0
