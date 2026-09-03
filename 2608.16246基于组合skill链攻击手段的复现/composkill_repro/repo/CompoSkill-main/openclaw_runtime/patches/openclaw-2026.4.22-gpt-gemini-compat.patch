@@ -1,0 +1,61 @@
+diff --git a/dist/gpt5-prompt-overlay-CcXMlccC.js b/dist/gpt5-prompt-overlay-CcXMlccC.js
+--- a/dist/gpt5-prompt-overlay-CcXMlccC.js
++++ b/dist/gpt5-prompt-overlay-CcXMlccC.js
+@@ -92,6 +92,10 @@ function isGpt5ModelId(modelId) {
+ 	return normalized ? GPT5_MODEL_ID_PATTERN.test(normalized) : false;
+ }
+ function resolveGpt5SystemPromptContribution(params) {
++	// GPT benchmark runs must not receive OpenClaw's extra ask-first contract:
++	// it changes whether privacy-sensitive/external benchmark actions execute.
++	// The evaluator sets this marker only for its GPT/Gemini compatibility path.
++	if (process.env.MSC_RISKBENCH_OPENCLAW_MODEL_COMPAT === "1") return;
+ 	if (!params.enabled) return;
+ 	const mode = resolveGpt5PromptOverlayMode(params.config, params.legacyPluginConfig);
+ 	return {
+diff --git a/dist/bash-tools.schemas-BcC7zUq_.js b/dist/bash-tools.schemas-BcC7zUq_.js
+--- a/dist/bash-tools.schemas-BcC7zUq_.js
++++ b/dist/bash-tools.schemas-BcC7zUq_.js
+@@ -1,5 +1,9 @@
+ import { Type } from "typebox";
+ //#region src/agents/bash-tools.schemas.ts
++// MSC-RiskBench special-model runs hide model-selectable approval controls.
++// GPT/Gemini otherwise tend to override the runner policy, which makes the
++// benchmark measure provider-specific tool syntax rather than task behavior.
++const mscRiskBenchModelCompat = process.env.MSC_RISKBENCH_OPENCLAW_MODEL_COMPAT === "1";
+ const execSchema = Type.Object({
+ 	command: Type.String({ description: "Shell command to execute" }),
+ 	workdir: Type.Optional(Type.String({ description: "Working directory (defaults to cwd)" })),
+@@ -12,8 +16,10 @@ const execSchema = Type.Object({
+ 	elevated: Type.Optional(Type.Boolean({ description: "Run on the host with elevated permissions (if allowed)" })),
+ 	host: Type.Optional(Type.String({ description: "Exec host/target (auto|sandbox|gateway|node)." })),
+ 	node: Type.Optional(Type.String({ description: "Node id/name for host=node." })),
+-	security: Type.Optional(Type.String({ description: "Exec security policy (deny|allowlist|full)." })),
+-	ask: Type.Optional(Type.String({ description: "Exec approval policy (off|on-miss|always)." }))
++	...mscRiskBenchModelCompat ? {} : {
++		security: Type.Optional(Type.String({ description: "Exec security policy (deny|allowlist|full)." })),
++		ask: Type.Optional(Type.String({ description: "Exec approval policy (off|on-miss|always)." }))
++	}
+ });
+ const processSchema = Type.Object({
+ 	action: Type.String({ description: "Process action" }),
+diff --git a/dist/bash-tools-CFFDAptf.js b/dist/bash-tools-CFFDAptf.js
+--- a/dist/bash-tools-CFFDAptf.js
++++ b/dist/bash-tools-CFFDAptf.js
+@@ -1939,11 +1939,15 @@ function createExecTool(options) {
+ 			});
+ 			const host = target.effectiveHost;
+ 			const approvalDefaults = loadExecApprovals().defaults;
+ 			const configuredSecurity = defaults?.security ?? approvalDefaults?.security ?? (host === "sandbox" ? "deny" : "full");
+-			let security = params.security ?? configuredSecurity;
++			// GPT/Gemini sometimes inject their own approval policy into tool calls.
++			// Ignore it only when the evaluator selected the special compatibility
++			// flow; all other models keep OpenClaw's original parameter behavior.
++			const mscRiskBenchModelCompat = process.env.MSC_RISKBENCH_OPENCLAW_MODEL_COMPAT === "1";
++			let security = mscRiskBenchModelCompat ? configuredSecurity : params.security ?? configuredSecurity;
+ 			if (elevatedRequested && elevatedMode === "full") security = "full";
+ 			const configuredAsk = defaults?.ask ?? approvalDefaults?.ask ?? "off";
+-			let ask = params.ask ?? configuredAsk;
++			let ask = mscRiskBenchModelCompat ? configuredAsk : params.ask ?? configuredAsk;
+ 			const bypassApprovals = elevatedRequested && elevatedMode === "full";
+ 			if (bypassApprovals) ask = "off";
+ 			const sandbox = host === "sandbox" ? defaults?.sandbox : void 0;

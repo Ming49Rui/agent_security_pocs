@@ -1,0 +1,17 @@
+# Core dependencies for the Skill-Combinatorial-Attack code supplement.
+# Only packages directly imported by the bundled scripts are listed.
+# Python >= 3.11 is required (nanobot-ai constraint).
+
+# LLM/API HTTP clients (used by build_skill_snapshot, build_skill_pools, msc_llm, eval)
+requests>=2.31.0,<3.0.0
+
+# YAML config parsing (used by generate_hsb_tasks, inject_attack_plan, eval)
+PyYAML>=6.0.2,<7.0.0
+
+# Agent runtime (Stage 4 evaluation). Install from PyPI.
+# Source: https://pypi.org/project/nanobot-ai/
+nanobot-ai>=0.1.4.post5
+
+# NOTE: openclaw_skills_guard/ has its own requirements.txt (fastapi, uvicorn, httpx).
+# Install it separately ONLY if you plan to run baseline-B (SkillsGuard scanner):
+#     pip install -r openclaw_skills_guard/requirements.txt

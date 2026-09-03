@@ -1,0 +1,698 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>蚁天鉴龙虾卫士 — OpenClaw Skills 安全审计</title>
+<script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg: #070b1a;
+  --surface: rgba(255, 255, 255, 0.04);
+  --surface2: rgba(255, 255, 255, 0.06);
+  --border: rgba(255, 255, 255, 0.08);
+  --text: #e8eaed;
+  --text2: #8c92a4;
+  --accent: #1677ff;
+  --accent2: #4096ff;
+  --green: #52c41a;
+  --yellow: #faad14;
+  --red: #ff4d4f;
+  --orange: #fa8c16;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Noto Sans SC", sans-serif;
+  background: var(--bg);
+  background-image:
+    radial-gradient(ellipse 60% 40% at 50% 0%, rgba(22, 119, 255, 0.12) 0%, transparent 70%),
+    radial-gradient(ellipse 40% 30% at 80% 20%, rgba(64, 150, 255, 0.06) 0%, transparent 60%);
+  background-attachment: fixed;
+  color: var(--text);
+  min-height: 100vh;
+  line-height: 1.6;
+}
+
+.container { max-width: 1200px; margin: 0 auto; padding: 24px 20px; }
+
+/* Top row: config + upload side by side */
+.top-row {
+  display: flex;
+  gap: 18px;
+  align-items: stretch;
+  margin-bottom: 18px;
+}
+.top-row .config-panel {
+  flex: 1;
+  margin-bottom: 0;
+}
+.top-row .upload-zone {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  margin-bottom: 0;
+}
+@media (max-width: 768px) {
+  .top-row { flex-direction: column; }
+}
+
+header {
+  text-align: center;
+  padding: 28px 0 18px;
+}
+header h1 {
+  font-size: 1.6rem;
+  font-weight: 700;
+  background: linear-gradient(135deg, #1677ff, #36cfc9);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+header p { color: var(--text2); margin-top: 4px; font-size: 0.85rem; }
+
+/* Config panel */
+.config-panel {
+  background: var(--surface);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 16px 18px;
+  margin-bottom: 18px;
+}
+.config-panel h2 {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--accent2);
+  margin-bottom: 4px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.config-panel .config-hint {
+  font-size: 0.75rem;
+  color: var(--text2);
+  margin-bottom: 12px;
+}
+.config-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+.config-grid .full-width { grid-column: 1 / -1; }
+.config-field label {
+  display: block;
+  font-size: 0.8rem;
+  color: var(--text2);
+  margin-bottom: 4px;
+  font-weight: 500;
+}
+.config-field input {
+  width: 100%;
+  padding: 10px 14px;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  color: var(--text);
+  font-size: 0.9rem;
+  outline: none;
+  transition: border-color 0.2s;
+}
+.config-field input:focus {
+  border-color: #1677ff;
+  box-shadow: 0 0 0 2px rgba(22, 119, 255, 0.15);
+}
+.config-field input::placeholder {
+  color: var(--text2);
+  opacity: 0.6;
+}
+.config-actions {
+  display: flex;
+  gap: 12px;
+  margin-top: 18px;
+  align-items: center;
+}
+.btn {
+  padding: 10px 22px;
+  border: none;
+  border-radius: 8px;
+  font-size: 0.88rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+.btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+.btn-primary {
+  background: var(--accent);
+  color: #fff;
+}
+.btn-primary:hover:not(:disabled) { background: var(--accent2); }
+.btn-success {
+  background: linear-gradient(135deg, #1677ff, #4096ff);
+  color: #fff;
+}
+.btn-success:hover { background: linear-gradient(135deg, #4096ff, #69b1ff); box-shadow: 0 4px 16px rgba(22, 119, 255, 0.3); }
+.config-status {
+  font-size: 0.85rem;
+  color: var(--text2);
+  flex: 1;
+}
+.config-status.success { color: var(--green); }
+.config-status.error { color: var(--red); }
+
+/* Connection badge */
+.connection-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 14px;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  font-size: 0.8rem;
+  margin-top: 12px;
+}
+.connection-badge .dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--red);
+}
+.connection-badge.connected .dot { background: var(--green); }
+.connection-badge .badge-text { color: var(--text2); }
+.connection-badge.connected .badge-text { color: var(--green); }
+
+/* Upload area */
+.upload-zone {
+  border: 2px dashed var(--border);
+  border-radius: 16px;
+  padding: 48px 24px;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.25s;
+  background: var(--surface);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  position: relative;
+}
+.upload-zone:hover:not(.disabled), .upload-zone.dragover:not(.disabled) {
+  border-color: #1677ff;
+  background: rgba(22, 119, 255, 0.05);
+}
+.upload-zone.disabled {
+  pointer-events: none;
+  opacity: 0.4;
+}
+.upload-icon { font-size: 3rem; margin-bottom: 12px; }
+.upload-zone h3 { font-size: 1.1rem; font-weight: 600; }
+.upload-zone p { color: var(--text2); font-size: 0.85rem; margin-top: 6px; }
+.upload-zone input { display: none; }
+.upload-lock-hint {
+  margin-top: 10px;
+  font-size: 0.82rem;
+  color: var(--orange);
+  display: none;
+}
+.upload-zone.disabled .upload-lock-hint { display: block; }
+
+/* Progress / status */
+.status-bar {
+  margin-top: 24px;
+  padding: 16px 20px;
+  background: var(--surface);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  display: none;
+}
+.status-bar.active { display: block; }
+.status-text { font-size: 0.9rem; color: var(--text2); }
+.progress-track {
+  margin-top: 10px;
+  height: 4px;
+  background: var(--surface2);
+  border-radius: 2px;
+  overflow: hidden;
+}
+.progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #1677ff, #36cfc9);
+  border-radius: 2px;
+  width: 0%;
+  transition: width 0.3s;
+}
+.progress-fill.indeterminate {
+  width: 30%;
+  animation: indeterminate 1.5s infinite;
+}
+@keyframes indeterminate {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(400%); }
+}
+
+/* Pre-scan summary cards */
+.prescan-section {
+  margin-top: 24px;
+  display: none;
+}
+.prescan-section.active { display: block; }
+.prescan-section h2 {
+  font-size: 1.1rem;
+  font-weight: 600;
+  margin-bottom: 12px;
+  color: var(--accent2);
+}
+.scan-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 10px;
+}
+.scan-card {
+  padding: 14px;
+  background: var(--surface);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+}
+.scan-card .label { font-size: 0.78rem; color: var(--text2); }
+.scan-card .value { font-size: 1.3rem; font-weight: 700; margin-top: 4px; }
+.scan-card .value.safe { color: var(--green); }
+.scan-card .value.warn { color: var(--yellow); }
+.scan-card .value.danger { color: var(--red); }
+
+/* Report */
+.report-section {
+  margin-top: 24px;
+  display: none;
+}
+.report-section.active { display: block; }
+.report-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+}
+.report-header h2 { font-size: 1.1rem; font-weight: 600; color: var(--accent2); }
+.btn-download {
+  padding: 6px 16px;
+  background: linear-gradient(135deg, #1677ff, #4096ff);
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  font-size: 0.82rem;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.btn-download:hover { background: linear-gradient(135deg, #4096ff, #69b1ff); box-shadow: 0 4px 16px rgba(22, 119, 255, 0.3); }
+.report-body {
+  padding: 24px;
+  background: var(--surface);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  font-size: 0.9rem;
+  line-height: 1.75;
+  overflow-x: auto;
+}
+.report-body h1, .report-body h2, .report-body h3 { color: var(--text); margin-top: 20px; }
+.report-body h1 { font-size: 1.3rem; border-bottom: 1px solid var(--border); padding-bottom: 8px; }
+.report-body h2 { font-size: 1.1rem; }
+.report-body h3 { font-size: 0.95rem; color: var(--accent2); }
+.report-body table { width: 100%; border-collapse: collapse; margin: 12px 0; font-size: 0.82rem; }
+.report-body th, .report-body td { padding: 8px 10px; border: 1px solid var(--border); text-align: left; }
+.report-body th { background: var(--surface2); font-weight: 600; }
+.report-body code { background: var(--surface2); padding: 2px 6px; border-radius: 4px; font-size: 0.85em; }
+.report-body pre { background: var(--surface2); padding: 14px; border-radius: 8px; overflow-x: auto; margin: 10px 0; }
+.report-body pre code { background: none; padding: 0; }
+.report-body ul, .report-body ol { padding-left: 20px; }
+.report-body blockquote { border-left: 3px solid #1677ff; padding-left: 14px; color: var(--text2); margin: 10px 0; }
+
+/* Footer */
+footer {
+  text-align: center;
+  padding: 40px 0 24px;
+  color: var(--text2);
+  font-size: 0.78rem;
+}
+
+/* Error */
+.error-msg {
+  margin-top: 16px;
+  padding: 14px 18px;
+  background: rgba(225, 112, 85, 0.1);
+  border: 1px solid rgba(225, 112, 85, 0.3);
+  border-radius: 10px;
+  color: var(--red);
+  font-size: 0.9rem;
+  display: none;
+}
+.error-msg.active { display: block; }
+</style>
+</head>
+<body>
+<div class="container">
+  <header>
+    <h1>蚁天鉴龙虾卫士</h1>
+    <p>OpenClaw Skills 安全审计系统 — 配置模型后上传 Skill 压缩包，自动生成安全报告</p>
+    <div class="connection-badge" id="connectionBadge">
+      <span class="dot"></span>
+      <span class="badge-text">未连接</span>
+    </div>
+  </header>
+
+  <!-- Top row: Config + Upload side by side -->
+  <div class="top-row">
+  <div class="config-panel" id="configPanel">
+    <h2>⚙️ 模型配置</h2>
+    <div class="config-hint">当前仅支持 OpenAI API 协议（兼容接口）的大模型</div>
+    <div class="config-grid">
+      <div class="config-field full-width">
+        <label>API URL</label>
+        <input type="text" id="cfgApiUrl" placeholder="http://localhost:8002/v1/chat/completions">
+      </div>
+      <div class="config-field">
+        <label>模型名称</label>
+        <input type="text" id="cfgModel" placeholder="gpt-4o / Qwen-3B">
+      </div>
+      <div class="config-field">
+        <label>API Key（可选）</label>
+        <input type="password" id="cfgApiKey" placeholder="sk-...">
+      </div>
+      <div class="config-field">
+        <label>最大上下文 Tokens</label>
+        <input type="number" id="cfgMaxCtx" placeholder="131072" min="1024" step="1024">
+      </div>
+      <div class="config-field">
+        <label>最大输出 Tokens</label>
+        <input type="number" id="cfgMaxOut" placeholder="4096" min="256" step="256">
+      </div>
+    </div>
+    <div class="config-actions">
+      <button class="btn btn-success" id="btnTestConn" onclick="testConnection()">🔗 测试连接</button>
+      <span class="config-status" id="configStatus"></span>
+    </div>
+  </div>
+
+  <div class="upload-zone disabled" id="uploadZone">
+    <div class="upload-icon">📁</div>
+    <h3>拖拽 ZIP 文件到此处，或点击选择文件</h3>
+    <p>支持 .zip 格式 &middot; 将 Skill 文件夹打包为 ZIP 后上传，最大支持50M文件</p>
+    <div class="upload-lock-hint">🔒 请先完成模型配置并通过联通性测试</div>
+    <input type="file" id="fileInput" accept=".zip">
+  </div>
+  </div><!-- end .top-row -->
+
+  <div class="error-msg" id="errorMsg"></div>
+
+  <div class="status-bar" id="statusBar">
+    <div class="status-text" id="statusText">准备中...</div>
+    <div class="progress-track">
+      <div class="progress-fill indeterminate" id="progressFill"></div>
+    </div>
+  </div>
+
+  <div class="prescan-section" id="prescanSection">
+    <h2>正则预扫描结果</h2>
+    <div class="scan-grid" id="scanGrid"></div>
+  </div>
+
+  <div class="report-section" id="reportSection">
+    <div class="report-header">
+      <h2>AI 安全审计报告</h2>
+      <button class="btn-download" onclick="downloadReport()">下载报告 (.md)</button>
+    </div>
+    <div class="report-body" id="reportBody"></div>
+  </div>
+
+  <footer>
+    蚁天鉴龙虾卫士 &copy; 2026 &mdash; Powered by regex + LLM dual engine
+  </footer>
+</div>
+
+<script>
+const uploadZone = document.getElementById('uploadZone');
+const fileInput = document.getElementById('fileInput');
+const statusBar = document.getElementById('statusBar');
+const statusText = document.getElementById('statusText');
+const progressFill = document.getElementById('progressFill');
+const errorMsg = document.getElementById('errorMsg');
+const prescanSection = document.getElementById('prescanSection');
+const scanGrid = document.getElementById('scanGrid');
+const reportSection = document.getElementById('reportSection');
+const reportBody = document.getElementById('reportBody');
+const connectionBadge = document.getElementById('connectionBadge');
+const configStatus = document.getElementById('configStatus');
+const btnTestConn = document.getElementById('btnTestConn');
+
+let fullReport = '';
+let modelConnected = false;
+
+/* --- Init: load config from server --- */
+fetch('/api/config').then(r => r.json()).then(cfg => {
+  document.getElementById('cfgApiUrl').value = cfg.llm_api_url || '';
+  document.getElementById('cfgModel').value = cfg.llm_model || '';
+  document.getElementById('cfgApiKey').value = cfg.llm_api_key || '';
+  document.getElementById('cfgMaxCtx').value = cfg.max_context_tokens || '';
+  document.getElementById('cfgMaxOut').value = cfg.max_output_tokens || '';
+  modelConnected = cfg.model_connected || false;
+  updateConnectionUI();
+}).catch(() => {
+  setConfigStatus('配置加载失败', 'error');
+});
+
+/* --- Connection UI --- */
+function updateConnectionUI() {
+  if (modelConnected) {
+    connectionBadge.classList.add('connected');
+    connectionBadge.querySelector('.badge-text').textContent = '已连接';
+    uploadZone.classList.remove('disabled');
+  } else {
+    connectionBadge.classList.remove('connected');
+    connectionBadge.querySelector('.badge-text').textContent = '未连接';
+    uploadZone.classList.add('disabled');
+  }
+}
+
+function setConfigStatus(msg, level) {
+  configStatus.textContent = msg;
+  configStatus.className = 'config-status' + (level ? ' ' + level : '');
+}
+
+/* --- Config change listener: any edit locks upload zone --- */
+['cfgApiUrl', 'cfgModel', 'cfgApiKey', 'cfgMaxCtx', 'cfgMaxOut'].forEach(id => {
+  document.getElementById(id).addEventListener('input', () => {
+    if (modelConnected) {
+      modelConnected = false;
+      updateConnectionUI();
+      setConfigStatus('配置已修改，请重新测试连接', '');
+    }
+  });
+});
+
+/* --- Test Connection --- */
+async function testConnection() {
+  btnTestConn.disabled = true;
+  setConfigStatus('正在保存配置并测试连接...', '');
+
+  const body = {
+    llm_api_url: document.getElementById('cfgApiUrl').value.trim(),
+    llm_model: document.getElementById('cfgModel').value.trim(),
+    llm_api_key: document.getElementById('cfgApiKey').value,
+    max_context_tokens: parseInt(document.getElementById('cfgMaxCtx').value) || null,
+    max_output_tokens: parseInt(document.getElementById('cfgMaxOut').value) || null,
+  };
+
+  try {
+    const resp = await fetch('/api/test-connection', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(body),
+    });
+    if (!resp.ok) throw new Error('HTTP ' + resp.status);
+    const result = await resp.json();
+    modelConnected = result.success;
+    updateConnectionUI();
+
+    if (result.success) {
+      let msg = '✅ ' + result.message;
+      if (result.response_preview) {
+        msg += ' (模型回复: ' + result.response_preview.substring(0, 50) + ')';
+      }
+      setConfigStatus(msg, 'success');
+    } else {
+      setConfigStatus('❌ ' + result.message, 'error');
+    }
+  } catch (e) {
+    setConfigStatus('测试失败: ' + e.message, 'error');
+    modelConnected = false;
+    updateConnectionUI();
+  } finally {
+    btnTestConn.disabled = false;
+  }
+}
+
+/* --- Upload --- */
+uploadZone.addEventListener('click', () => { if (!uploadZone.classList.contains('disabled')) fileInput.click(); });
+uploadZone.addEventListener('dragover', e => { e.preventDefault(); if (!uploadZone.classList.contains('disabled')) uploadZone.classList.add('dragover'); });
+uploadZone.addEventListener('dragleave', () => uploadZone.classList.remove('dragover'));
+uploadZone.addEventListener('drop', e => {
+  e.preventDefault();
+  uploadZone.classList.remove('dragover');
+  if (uploadZone.classList.contains('disabled')) return;
+  const files = e.dataTransfer.files;
+  if (files.length > 0) startAudit(files[0]);
+});
+fileInput.addEventListener('change', () => {
+  if (fileInput.files.length > 0) startAudit(fileInput.files[0]);
+});
+
+function showError(msg) {
+  errorMsg.textContent = msg;
+  errorMsg.classList.add('active');
+}
+function clearError() {
+  errorMsg.classList.remove('active');
+}
+
+function startAudit(file) {
+  if (!modelConnected) {
+    showError('请先完成模型配置并通过联通性测试');
+    return;
+  }
+  if (!file.name.toLowerCase().endsWith('.zip')) {
+    showError('请上传 .zip 格式的文件');
+    return;
+  }
+  clearError();
+  fullReport = '';
+  reportBody.innerHTML = '';
+  scanGrid.innerHTML = '';
+  prescanSection.classList.remove('active');
+  reportSection.classList.remove('active');
+
+  uploadZone.classList.add('disabled');
+  statusBar.classList.add('active');
+  progressFill.classList.add('indeterminate');
+  statusText.textContent = '📤 正在上传...';
+
+  const formData = new FormData();
+  formData.append('file', file);
+
+  fetch('/api/audit', { method: 'POST', body: formData })
+    .then(response => {
+      if (!response.ok) throw new Error('HTTP ' + response.status);
+      const reader = response.body.getReader();
+      const decoder = new TextDecoder();
+      let buffer = '';
+
+      function read() {
+        reader.read().then(({ done, value }) => {
+          if (done) { onComplete(); return; }
+          buffer += decoder.decode(value, { stream: true });
+          const lines = buffer.split('\n');
+          buffer = lines.pop();
+          for (const line of lines) {
+            if (line.startsWith('data: ')) {
+              try {
+                const evt = JSON.parse(line.slice(6));
+                handleEvent(evt);
+              } catch {}
+            }
+          }
+          read();
+        }).catch(err => {
+          showError('连接中断: ' + err.message);
+          onComplete();
+        });
+      }
+      read();
+    })
+    .catch(err => {
+      showError('请求失败: ' + err.message);
+      onComplete();
+    });
+}
+
+function handleEvent(evt) {
+  switch (evt.type) {
+    case 'status':
+      statusText.textContent = evt.message;
+      break;
+    case 'pre_scan':
+      renderPrescan(evt.data);
+      break;
+    case 'ai_chunk':
+      fullReport += evt.content;
+      reportSection.classList.add('active');
+      reportBody.innerHTML = marked.parse(fullReport);
+      reportBody.scrollTop = reportBody.scrollHeight;
+      break;
+    case 'error':
+      showError(evt.message);
+      onComplete();
+      break;
+    case 'done':
+      statusText.textContent = evt.message;
+      progressFill.classList.remove('indeterminate');
+      progressFill.style.width = '100%';
+      break;
+  }
+}
+
+function onComplete() {
+  uploadZone.classList.remove('disabled');
+  if (modelConnected) {
+    uploadZone.classList.remove('disabled');
+  } else {
+    uploadZone.classList.add('disabled');
+  }
+  progressFill.classList.remove('indeterminate');
+  progressFill.style.width = '100%';
+}
+
+function renderPrescan(data) {
+  prescanSection.classList.add('active');
+  scanGrid.innerHTML = '';
+
+  const addCard = (label, value, level) => {
+    const card = document.createElement('div');
+    card.className = 'scan-card';
+    card.innerHTML = '<div class="label">' + label + '</div><div class="value ' + level + '">' + value + '</div>';
+    scanGrid.appendChild(card);
+  };
+
+  addCard('文件总数', data.structure.total_files, 'safe');
+  addCard('正则命中总数', data.total_hits, data.total_hits > 10 ? 'danger' : data.total_hits > 0 ? 'warn' : 'safe');
+
+  for (const [, cat] of Object.entries(data.categories)) {
+    const total = cat.items.reduce((s, i) => s + i.count, 0);
+    const level = total > 5 ? 'danger' : total > 0 ? 'warn' : 'safe';
+    addCard(cat.label, total, level);
+  }
+}
+
+function downloadReport() {
+  if (!fullReport) return;
+  const blob = new Blob([fullReport], { type: 'text/markdown;charset=utf-8' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'aicoguardclaw-report-' + new Date().toISOString().slice(0, 10) + '.md';
+  a.click();
+  URL.revokeObjectURL(url);
+}
+</script>
+</body>
+</html>

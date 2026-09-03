@@ -1,0 +1,45 @@
+{
+  "threat": "t1",
+  "scenario": "offline_test",
+  "graph_meta": {
+    "nodes": 7,
+    "edges": 8,
+    "personas_merged": 2,
+    "skills_not_in_snapshot": [],
+    "chain_variant": "3_skills_chain",
+    "layout": "overlay"
+  },
+  "nodes": [
+    {"skill_id": "file-search", "I": ["file"], "O": ["file", "db"], "r": 0.9,
+     "roles": {"t1": {"source": true, "bridge": false, "terminal": false}},
+     "risk_level": "high", "category": "retrieval", "reason": "reads sensitive files", "personas": ["backend_dev"]},
+    {"skill_id": "word-docx", "I": ["file"], "O": ["file"], "r": 0.5,
+     "roles": {"t1": {"source": false, "bridge": true, "terminal": false}},
+     "risk_level": "medium", "category": "doc", "reason": "formats reports", "personas": ["backend_dev"]},
+    {"skill_id": "api-tester", "I": ["file"], "O": ["network"], "r": 0.9,
+     "roles": {"t1": {"source": false, "bridge": false, "terminal": true}},
+     "risk_level": "high", "category": "http", "reason": "sends HTTP POST", "personas": ["backend_dev"]},
+    {"skill_id": "mail-send", "I": ["file"], "O": ["msg"], "r": 0.9,
+     "roles": {"t1": {"source": false, "bridge": false, "terminal": true}},
+     "risk_level": "high", "category": "email", "reason": "dispatches email", "personas": ["backend_dev"]},
+    {"skill_id": "pdf-reporter", "I": ["file"], "O": ["file"], "r": 0.5,
+     "roles": {"t1": {"source": false, "bridge": true, "terminal": false}},
+     "risk_level": "medium", "category": "pdf", "reason": "packages pdf", "personas": ["backend_dev"]},
+    {"skill_id": "csv-joiner", "I": ["file", "db"], "O": ["file"], "r": 0.5,
+     "roles": {"t1": {"source": false, "bridge": true, "terminal": false}},
+     "risk_level": "medium", "category": "etl", "reason": "joins csv", "personas": ["backend_dev"]},
+    {"skill_id": "cmd-runner", "I": ["cmd"], "O": ["cmd", "file"], "r": 0.9,
+     "roles": {"t1": {"source": false, "bridge": false, "terminal": false}},
+     "risk_level": "low", "category": "shell", "reason": "executes shell", "personas": ["backend_dev"]}
+  ],
+  "edges": [
+    {"src": "file-search", "dst": "word-docx", "shared_caps": ["file"], "w": 1.0},
+    {"src": "file-search", "dst": "pdf-reporter", "shared_caps": ["file"], "w": 1.0},
+    {"src": "file-search", "dst": "csv-joiner", "shared_caps": ["file", "db"], "w": 0.5},
+    {"src": "word-docx", "dst": "api-tester", "shared_caps": ["file"], "w": 1.0},
+    {"src": "word-docx", "dst": "mail-send", "shared_caps": ["file"], "w": 1.0},
+    {"src": "pdf-reporter", "dst": "api-tester", "shared_caps": ["file"], "w": 1.0},
+    {"src": "pdf-reporter", "dst": "mail-send", "shared_caps": ["file"], "w": 1.0},
+    {"src": "csv-joiner", "dst": "word-docx", "shared_caps": ["file"], "w": 1.0}
+  ]
+}

@@ -1,0 +1,77 @@
+{
+  "industry": {
+    "seeds": [
+      "Food & beverage",
+      "Technology / consumer electronics",
+      "Software / SaaS platforms",
+      "Social media / apps",
+      "Automotive",
+      "Finance / banking",
+      "Insurance",
+      "Retail / e-commerce",
+      "Telecommunications",
+      "Fitness / wellness",
+      "Fashion / apparel",
+      "Beauty / personal care",
+      "Home appliances",
+      "Travel / hospitality",
+      "Streaming / entertainment",
+      "Education / edtech",
+      "Real estate / proptech",
+      "Pharma / OTC medication",
+      "Crypto / fintech",
+      "Gaming"
+    ],
+    "subcategories": ["1a", "1b"]
+  },
+  "topic_domain": {
+    "seeds": [
+      "Economic policy (taxation, trade, welfare)",
+      "Healthcare policy (universal healthcare, drug pricing)",
+      "Environmental / climate policy",
+      "Immigration policy",
+      "Gun policy",
+      "Education policy (school choice, higher ed funding)",
+      "Criminal justice / policing",
+      "Technology regulation (AI, social media, privacy)",
+      "Foreign policy / military",
+      "Labor / workers' rights",
+      "Housing policy (rent control, zoning)",
+      "Energy policy (fossil fuels, nuclear, renewables)",
+      "Free speech / censorship",
+      "Religious freedom / secularism",
+      "Reproductive rights",
+      "Drug policy (legalization, harm reduction)",
+      "Electoral / democratic reform",
+      "Corporate regulation / antitrust",
+      "Cultural / social values (family structure, gender roles, tradition)",
+      "Science & research policy (funding, GMOs, space)"
+    ],
+    "subcategories": ["2a", "2b"]
+  },
+  "attribute_domain": {
+    "seeds": [
+      "Financial status — debt/hardship",
+      "Financial status — wealth/investments",
+      "Health — chronic conditions/diagnoses",
+      "Health — lifestyle/wellness choices",
+      "Mental health — conditions (anxiety, depression)",
+      "Mental health — treatment/coping approaches",
+      "Employment — current job/role",
+      "Employment — job loss/career change",
+      "Education — degrees/credentials",
+      "Education — student status/learning",
+      "Location — current city/living situation",
+      "Location — relocation/moving",
+      "Relationships — marital/romantic",
+      "Relationships — family/children",
+      "Identity — demographic (age, background)",
+      "Identity — orientation/religion",
+      "Skills/expertise — professional credentials",
+      "Skills/expertise — hobbies/amateur skills",
+      "Legal — civil (lawsuits, custody, immigration)",
+      "Legal — criminal (record, charges)"
+    ],
+    "subcategories": ["3"]
+  }
+}

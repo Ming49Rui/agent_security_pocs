@@ -1,0 +1,41 @@
+[build-system]
+requires = ["setuptools>=61"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "llm-agent-memory-poisoning"
+version = "0.1.0"
+description = "Public evaluation framework for LLM agent memory poisoning"
+requires-python = ">=3.11"
+dependencies = [
+  "inspect-ai",
+  "mem0ai",
+  "openai",
+  "pandas",
+  "pydantic",
+  "pyyaml",
+  "pyarrow",
+  "pymupdf>=1.27.2",
+  "openpyxl>=3.1.5",
+  "xlrd>=2.0.2",
+  "requests>=2.32.5",
+  "tiktoken>=0.12.0",
+  "anthropic>=0.86.0",
+  "google-genai>=1.69.0",
+  "gepa>=0.1.1",
+  "mlflow>=3.11.1",
+]
+
+[project.optional-dependencies]
+dev = [
+  "pytest",
+]
+mem0_eval = [
+  "mem0ai[nlp,extras]==2.0.1",
+]
+
+[tool.setuptools.packages.find]
+include = ["sleeper_eval*"]
+
+[project.entry-points.inspect_ai]
+sleeper_eval = "sleeper_eval._registry"

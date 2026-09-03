@@ -1,0 +1,235 @@
+{
+  "threat": "t1",
+  "scenario": "offline_test",
+  "graph_meta": {
+    "nodes": 7,
+    "edges": 8
+  },
+  "search": {
+    "candidate_k": 24,
+    "top_k": 5,
+    "max_len": 10,
+    "llm_authored": false,
+    "chain_len_filter": null
+  },
+  "chains": [
+    {
+      "chain_id": "t1_offl_L4_01",
+      "chain_len": 4,
+      "path": [
+        "file-search",
+        "csv-joiner",
+        "word-docx",
+        "api-tester"
+      ],
+      "score": 0.405,
+      "edge_weights": [
+        0.5,
+        1.0,
+        1.0
+      ],
+      "coherence": null,
+      "coherence_reason": "",
+      "steps": [
+        {
+          "role": "source",
+          "capability": "file",
+          "business_step": "",
+          "_example_skill": "file-search",
+          "_skill_risk": "high"
+        },
+        {
+          "role": "bridge",
+          "capability": "file",
+          "business_step": "",
+          "_example_skill": "csv-joiner",
+          "_skill_risk": "medium"
+        },
+        {
+          "role": "bridge",
+          "capability": "file",
+          "business_step": "",
+          "_example_skill": "word-docx",
+          "_skill_risk": "medium"
+        },
+        {
+          "role": "terminal",
+          "capability": "network",
+          "business_step": "",
+          "_example_skill": "api-tester",
+          "_skill_risk": "high"
+        }
+      ],
+      "injection_mode": "workflow_output"
+    },
+    {
+      "chain_id": "t1_offl_L4_02",
+      "chain_len": 4,
+      "path": [
+        "file-search",
+        "csv-joiner",
+        "word-docx",
+        "mail-send"
+      ],
+      "score": 0.405,
+      "edge_weights": [
+        0.5,
+        1.0,
+        1.0
+      ],
+      "coherence": null,
+      "coherence_reason": "",
+      "steps": [
+        {
+          "role": "source",
+          "capability": "file",
+          "business_step": "",
+          "_example_skill": "file-search",
+          "_skill_risk": "high"
+        },
+        {
+          "role": "bridge",
+          "capability": "file",
+          "business_step": "",
+          "_example_skill": "csv-joiner",
+          "_skill_risk": "medium"
+        },
+        {
+          "role": "bridge",
+          "capability": "file",
+          "business_step": "",
+          "_example_skill": "word-docx",
+          "_skill_risk": "medium"
+        },
+        {
+          "role": "terminal",
+          "capability": "msg",
+          "business_step": "",
+          "_example_skill": "mail-send",
+          "_skill_risk": "high"
+        }
+      ],
+      "injection_mode": "workflow_output"
+    },
+    {
+      "chain_id": "t1_offl_L3_03",
+      "chain_len": 3,
+      "path": [
+        "file-search",
+        "word-docx",
+        "api-tester"
+      ],
+      "score": 0.81,
+      "edge_weights": [
+        1.0,
+        1.0
+      ],
+      "coherence": null,
+      "coherence_reason": "",
+      "steps": [
+        {
+          "role": "source",
+          "capability": "file",
+          "business_step": "",
+          "_example_skill": "file-search",
+          "_skill_risk": "high"
+        },
+        {
+          "role": "bridge",
+          "capability": "file",
+          "business_step": "",
+          "_example_skill": "word-docx",
+          "_skill_risk": "medium"
+        },
+        {
+          "role": "terminal",
+          "capability": "network",
+          "business_step": "",
+          "_example_skill": "api-tester",
+          "_skill_risk": "high"
+        }
+      ],
+      "injection_mode": "workflow_output"
+    },
+    {
+      "chain_id": "t1_offl_L3_04",
+      "chain_len": 3,
+      "path": [
+        "file-search",
+        "word-docx",
+        "mail-send"
+      ],
+      "score": 0.81,
+      "edge_weights": [
+        1.0,
+        1.0
+      ],
+      "coherence": null,
+      "coherence_reason": "",
+      "steps": [
+        {
+          "role": "source",
+          "capability": "file",
+          "business_step": "",
+          "_example_skill": "file-search",
+          "_skill_risk": "high"
+        },
+        {
+          "role": "bridge",
+          "capability": "file",
+          "business_step": "",
+          "_example_skill": "word-docx",
+          "_skill_risk": "medium"
+        },
+        {
+          "role": "terminal",
+          "capability": "msg",
+          "business_step": "",
+          "_example_skill": "mail-send",
+          "_skill_risk": "high"
+        }
+      ],
+      "injection_mode": "workflow_output"
+    },
+    {
+      "chain_id": "t1_offl_L3_05",
+      "chain_len": 3,
+      "path": [
+        "file-search",
+        "pdf-reporter",
+        "api-tester"
+      ],
+      "score": 0.81,
+      "edge_weights": [
+        1.0,
+        1.0
+      ],
+      "coherence": null,
+      "coherence_reason": "",
+      "steps": [
+        {
+          "role": "source",
+          "capability": "file",
+          "business_step": "",
+          "_example_skill": "file-search",
+          "_skill_risk": "high"
+        },
+        {
+          "role": "bridge",
+          "capability": "file",
+          "business_step": "",
+          "_example_skill": "pdf-reporter",
+          "_skill_risk": "medium"
+        },
+        {
+          "role": "terminal",
+          "capability": "network",
+          "business_step": "",
+          "_example_skill": "api-tester",
+          "_skill_risk": "high"
+        }
+      ],
+      "injection_mode": "workflow_output"
+    }
+  ]
+}

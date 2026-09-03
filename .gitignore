@@ -1,0 +1,10 @@
+2605.15338基于潜伏式记忆投毒的复现/repro/datasets/
+2608.16246基于组合skill链攻击手段的复现/composkill_repro/datasets/
+2608.16246基于组合skill链攻击手段的复现/composkill_repro/repo/CompoSkill-main/benchmark/results_smoke/
+# 原有内容保留，追加下面
+venv*/
+.venv*/
+composkill_repro/venv312/
+
+# 万能规则：任意层级下叫venv开头全部忽略
+**/venv*/
