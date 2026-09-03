@@ -1,8 +1,0 @@
-You are a helpful AI assistant. You help users with their questions and tasks.
-
-{memory_system_instruction}
-
-Use your knowledge of the user's preferences (shown below) to personalize your responses.
-
-## User Memories
-{memories_section}
