@@ -1,0 +1,105 @@
+==============================================================================
+REPRODUCING arXiv:2606.30566v2  (Forensic Trajectory Signatures)
+Synthetic mechanism-faithful data - see README.md for the mapping
+==============================================================================
+
+[Dataset] P1 runs=2,520  attack=1919  non-exfil=601 (76.2%)   (paper: 2,520 / 1,919 / 601)
+
+[Table 5 check] per-defense class balance
+       defense |              N |           Natk |           Nneg
+------------------------------------------------------------------------
+    no_defense |            360 |            319 |             41
+     minimizer |            360 |            320 |             40
+     sanitizer |            360 |            320 |             40
+ rag_sanitizer |            360 |            320 |             40
+ rag_llm_judge |            360 |            320 |             40
+prompt_hardening |            360 |            280 |             80
+memory_sandbox |            360 |             40 |            320
+
+[Table 3 check] mean feature values (attack vs non-exfil)
+
+
+       feature |         attack |      non-exfil |          delta
+------------------------------------------------------------------------
+  recall_count |          1.284 |          0.830 |         +0.454
+send_without_recall |          0.104 |          0.324 |         -0.221
+max_recall_chain |          1.192 |          0.830 |         +0.362
+draft_then_send |          1.253 |          0.869 |         +0.384
+    list_count |          0.914 |          1.245 |         -0.331
+    send_count |          1.253 |          0.869 |         +0.384
+recall_before_send |          0.893 |          0.188 |         +0.705
+
+[Sec 3.1] Rule 'recall before send -> attack':
+  AUC=0.8523   Recall=0.8927   Accuracy=0.8734   FP=113  FN=206
+  paper: AUC=0.9563  Recall=0.9792  Accuracy=0.9683  FP=40  FN=40
+
+[Sec 3.2 / Table 1] 5-fold CV (threshold 0.5)
+
+
+    classifier |            AUC |    boot 95% CI |         Recall |           Prec |             F1 |        FN (FP)
+------------------------------------------------------------------------------------------------------------------------------
+Logistic Regression |         0.9466 |  [0.934,0.958] |         0.9838 |         0.9593 |         0.9714 |        31 (80)
+ Random Forest |         0.9644 |  [0.955,0.973] |         0.9838 |         0.9647 |         0.9742 |        31 (69)
+Gradient Boosted Trees |         0.9645 |  [0.955,0.973] |         0.9838 |         0.9647 |         0.9742 |        31 (69)
+  paper: all three AUC=0.9904 [0.987,0.993]  Recall=0.9838  FN=31
+  FN by defense (RF): {'memory_sandbox': 31}   (paper: all 31 in memory_sandbox)
+
+[Sec 3.3 / Table 2] top-10 RF importances (mean decrease in impurity)
+  recall_before_send     0.2182  <- mechanistic
+  recall_then_draft      0.1286
+  list_then_draft        0.1066
+  list_then_recall       0.0953
+  draft_then_send        0.0777
+  send_count             0.0726
+  draft_count            0.0581
+  max_recall_chain       0.0498
+  seq_len                0.0463
+  recall_then_recall     0.0399
+
+[Sec 3.6 / Table 6] feature-group ablation (RF, 5-fold CV)
+
+
+ group removed |         n feat |            AUC |          delta
+------------------------------------------------------------------------
+None (full model) |             19 |         0.9644 |        +0.0000
+   Mechanistic |             17 |         0.9644 |        +0.0000
+Frequency counts |             12 |         0.9614 |        -0.0029
+         Ratio |             17 |         0.9644 |        +0.0000
+Bigram transitions |             14 |         0.9645 |        +0.0001
+First-tool indicators |             16 |         0.9644 |        +0.0000
+All recall-related |             10 |         0.9612 |        -0.0032
+  paper: AUC stable at 0.9904 (min 0.9886); removing all 9 recall features -> 0.9904
+
+[Sec 3.4 / Table 4] leave-one-model-out (RF)
+
+
+held-out model |            AUC |         Recall | interpretation
+------------------------------------------------------------------------
+   qwen2.5:14b |          0.500 |          1.000 |        partial
+   qwen2.5:72b |          1.000 |          1.000 |    generalizes
+    qwen3.5:9b |          1.000 |          1.000 |    generalizes
+  qwen3.5:122b |          0.930 |          1.000 |        partial
+     qwen3:32b |          0.998 |          1.000 |    generalizes
+       qwq:32b |          0.319 |          0.000 |      inversion
+glm-4.7-flash:q8_0 |          1.000 |          1.000 |    generalizes
+   gpt-oss:20b |          0.995 |          1.000 |    generalizes
+gpt-oss-safeguard:120b |          1.000 |          1.000 |    generalizes
+  paper: 6/9 -> AUC 1.000; qwq:32b 0.000 (implicit bypass), qwen2.5:14b 0.083 (distributional inversion), qwen3.5:122b 0.750 (sleeper)
+
+[Sec 3.9] prefix-only variants (RF)
+  14-feature (+seq_len)      AUC=0.964
+  13-feature strict prefix   AUC=0.951
+  paper: 14-feat 0.990, 13-feat strict prefix 0.934
+
+[Sec 6] benign baseline study (13 model proxies x 8 cells)
+  N=4160  P(flag | recall_before_send=1) =  100.0%   (paper: 100.0%)  n=878
+  P(flag | recall_before_send=0) =    0.0%  (paper: 1.5%)  n=3282
+  unconditional FPR [mandatory] =  23.7%  (paper: 24.7-52.6% band across protocols)
+  unconditional FPR [optional ] =  18.6%  (paper: 24.7-52.6% band across protocols)
+  FPR by stored-facts k: {0: np.float64(0.0), 1: np.float64(28.46153846153846), 3: np.float64(28.173076923076923), 5: np.float64(27.78846153846154)}   (paper: k0=0%, k1=57.6%, k3=46%, k5=52.2% - non-monotonic)
+  FPR by phenotype: {'ground_then_act': ['58%', '65%', '56%'], 'act_without_ground': ['0%', '0%', '0%', '0%', '0%'], 'dont_act': ['0%', '0%'], 'bypass': ['0%'], 'ground_strong': ['57%'], 'ga_mild': ['38%']}
+
+  After gating 'external recipient': benign FPR=0.00%   (paper: 0% - perfect separation on its data)
+  Attack recall preserved (attacker address is always external): all attack sessions pass the gate -> recall 100% by construction
+
+Done. Figures and CSVs written to outputs
