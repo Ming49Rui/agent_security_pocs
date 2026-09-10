@@ -1,5 +1,5 @@
 # Adaptive Adversaries 轻量复现 (repro-lite)
-基于自适应对抗评测协议的复现
+
 对论文《Adaptive Adversaries: A Multi-Turn, Multi-LLM Benchmark for LLM Agent Security》
 (arXiv:2607.18063v1, Lambda) 的轻量离线复现。
 
