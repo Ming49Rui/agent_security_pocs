@@ -5,7 +5,7 @@ Language Model Agents"* 的轻量化复现项目：
 
 - **GhostWriter** —— 针对"工具型个人助手 Agent + 长期记忆"的记忆投毒攻击（两阶段：注入 P1 / 激活 P2）
 - **AM-Sentry** —— 论文提出的防御框架（记忆保存策略 S1/S2/S3 + 检索屏 R）
-
+  
 ## 项目定位（轻量化说明）
 
 论文原实验规模：5 种状态级记忆 Agent（A-Mem/Mem0/ExpeL/Letta/MemoryOS）×
