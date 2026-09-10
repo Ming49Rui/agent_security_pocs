@@ -1,0 +1,84 @@
+{
+  "n_safe": 129,
+  "n_toxic": 116,
+  "n_hard": 42,
+  "safe_rejection_rate": {
+    "deepseek-v4-flash": 0.1938,
+    "deepseek-v4-pro": 0.2016,
+    "glm-5.2-fast-preview": 0.4961,
+    "glm-5.2": 0.5116,
+    "qwen3.7-flash": 0.2791,
+    "MiniMax-M2.1": 0.2713
+  },
+  "toxic_acceptance_rate": {
+    "deepseek-v4-flash": 0.2069,
+    "deepseek-v4-pro": 0.2931,
+    "glm-5.2-fast-preview": 0.1293,
+    "glm-5.2": 0.1552,
+    "qwen3.7-flash": 0.181,
+    "MiniMax-M2.1": 0.1293
+  },
+  "toxic_rejection_rate": {
+    "deepseek-v4-flash": 0.7931,
+    "deepseek-v4-pro": 0.7069,
+    "glm-5.2-fast-preview": 0.8707,
+    "glm-5.2": 0.8448,
+    "qwen3.7-flash": 0.819,
+    "MiniMax-M2.1": 0.8707
+  },
+  "hard_rejection_rate": {
+    "deepseek-v4-flash": 0.5,
+    "deepseek-v4-pro": 0.3571,
+    "glm-5.2-fast-preview": 0.8095,
+    "glm-5.2": 0.7619,
+    "qwen3.7-flash": 0.8095,
+    "MiniMax-M2.1": 0.6905
+  },
+  "keyword_vs_judge": {
+    "deepseek-v4-flash": {
+      "keyword_reject": 25.0,
+      "judge_reject": 22.5,
+      "abs_diff_pct": 2.5
+    },
+    "deepseek-v4-pro": {
+      "keyword_reject": 12.5,
+      "judge_reject": 7.5,
+      "abs_diff_pct": 5.0
+    },
+    "glm-5.2-fast-preview": {
+      "keyword_reject": 57.5,
+      "judge_reject": 35.0,
+      "abs_diff_pct": 22.5
+    },
+    "glm-5.2": {
+      "keyword_reject": 62.5,
+      "judge_reject": 40.0,
+      "abs_diff_pct": 22.5
+    },
+    "qwen3.7-flash": {
+      "keyword_reject": 25.0,
+      "judge_reject": 32.5,
+      "abs_diff_pct": 7.5
+    },
+    "MiniMax-M2.1": {
+      "keyword_reject": 22.5,
+      "judge_reject": 32.5,
+      "abs_diff_pct": 10.0
+    }
+  },
+  "spearman_safe_vs_toxic_rej": 0.609,
+  "ablation_system_prompt": {
+    "glm-5.2-fast-preview": {
+      "safe_no_sp": 0.4667,
+      "safe_with_sp": 0.3,
+      "toxic_no_sp": 0.7333,
+      "toxic_with_sp": 0.5333
+    },
+    "deepseek-v4-flash": {
+      "safe_no_sp": 0.2,
+      "safe_with_sp": 0.2333,
+      "toxic_no_sp": 0.4667,
+      "toxic_with_sp": 0.5333
+    }
+  }
+}
