@@ -1,0 +1,13 @@
+{
+  "provider": "首序（deep）",
+  "roles": {
+    "attacker": { "model": "qwen-max",             "temperature": 1.0, "max_tokens": 2048 },
+    "proxy":    { "model": "qwen-max",             "temperature": 0.7, "max_tokens": 1024 },
+    "victim":   { "model": "deepseek-v4-flash-0731","temperature": 0.0, "max_tokens": 1024 },
+    "judge":    { "model": "qwen-max",             "temperature": 0.0, "max_tokens": 16 }
+  },
+  "num_actors": 2,
+  "max_turns": 5,
+  "seed": 42,
+  "max_workers": 3
+}
